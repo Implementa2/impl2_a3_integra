@@ -1,0 +1,23 @@
+impl2_a3_integra_config:
+  path: /impl2_a3_integra/configuration
+  methods: [GET, POST]
+  defaults:
+    # Controlador Symfony que mostrará el formulario de configuración
+    _controller: 'Implementa2\A3Integra\Controller\ConfigurationController::index'
+    # Valores legacy necesarios para el sistema de tabs de PS (pueden apuntar al nombre de este módulo)
+    _legacy_controller: AdminImpl2a3_integra
+    _legacy_link: AdminImpl2a3_integra
+
+# Ruta para sincronización inicial PS -> a3ERP
+impl2_a3_sync_initial_ps_to_a3:
+  path: /modules/impl2_a3_integra/sync/initial/ps-to-a3
+  methods: [GET]
+  defaults:
+    _controller: 'Implementa2\A3Integra\Controller\SyncController::initialSyncPsToA3'
+
+# Ruta para sincronización inicial a3ERP -> PS
+impl2_a3_sync_initial_a3_to_ps:
+  path: /modules/impl2_a3_integra/sync/initial/a3-to-ps
+  methods: [GET]
+  defaults:
+    _controller: 'Implementa2\A3Integra\Controller\SyncController::initialSyncA3ToPs'

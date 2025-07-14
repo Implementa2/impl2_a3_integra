@@ -1,0 +1,62 @@
+services:
+  # Comando que procesa la cola de sincronización
+  implementa2.impl2_a3_integra.process_queue_command:
+    class: Implementa2\A3Integra\Command\ProcessQueueCommand
+    arguments:
+      - '@implementa2.impl2_a3_integra.queue_service'
+      - '@implementa2.impl2_a3_integra.sync_service'
+    tags:
+      - { name: 'console.command', command: 'impl2a3:sync:process_queue' }
+
+  # Servicio cliente de API a3ERP
+  implementa2.impl2_a3_integra.a3erp_client:
+    class: Implementa2\A3Integra\Service\A3ERPClient
+
+  implementa2.impl2_a3_integra.encryptor:
+    class: Implementa2\A3Integra\Service\Encryptor
+
+  # Servicio principal de sincronización (genera tareas y procesa datos)
+  implementa2.impl2_a3_integra.sync_service:
+    class: Implementa2\A3Integra\Service\SyncService
+    arguments:
+      - '@implementa2.impl2_a3_integra.a3erp_client'
+      - '@implementa2.impl2_a3_integra.queue_service'
+      - '@implementa2.impl2_a3_integra.error_repository'
+
+  # Servicio de cola (gestiona la tabla a3erp_sync_queue)
+  implementa2.impl2_a3_integra.queue_service:
+    class: Implementa2\A3Integra\Service\QueueService
+    arguments:
+      - '@implementa2.impl2_a3_integra.error_repository'
+
+  # Repositorio de errores (tabla a3erp_pending_errors)
+  implementa2.impl2_a3_integra.error_repository:
+    class: Implementa2\A3Integra\Repository\ErrorRepository
+    public: true
+
+  # Comando de sincronización inicial (crea tareas en la cola)
+  implementa2.impl2_a3_integra.inicial_sync_command:
+    class: Implementa2\A3Integra\Command\InitialSyncCommand
+    arguments:
+      - '@implementa2.impl2_a3_integra.sync_service'
+    tags:
+      - { name: 'console.command', command: 'impl2a3:sync:initial' }
+
+  # DataProvider para el formulario de configuración
+  impl2_a3_integra.form.configuration_data_provider:
+    class: 'Implementa2\A3Integra\Form\DataProvider\ConfigurationDataProvider'
+    arguments:
+      - '@implementa2.impl2_a3_integra.encryptor'
+
+  # Form handler nativo de PS que maneja el guardado
+  prestashop.module.impl2_a3_integra.form.data_handler:
+    class: 'PrestaShop\PrestaShop\Core\Form\Handler'
+    arguments:
+      - '@form.factory'
+      - '@prestashop.core.hook.dispatcher'
+      - '@impl2_a3_integra.form.configuration_data_provider'
+      - 'Implementa2\A3Integra\Form\Type\ConfigurationType'
+      - 'impl2_a3_integra_configuration'
+    tags:
+      - { name: form.data_handler, alias: impl2_a3_integra_configuration }
+    

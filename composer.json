@@ -1,0 +1,13 @@
+{
+  "name": "impl2/a3_integra",
+  "description": "Sincronización PrestaShop ⇄ a3ERP",
+  "type": "prestashop-module",
+  "config": {
+      "prepend-autoloader": true
+  },
+  "autoload": {
+    "psr-4": {
+      "Implementa2\\A3Integra\\": "src/"
+    }
+  }
+}
